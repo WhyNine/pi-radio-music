@@ -15,7 +15,8 @@ package Graphics;
 use v5.28;
 use strict;
 
-our @EXPORT = qw ( init_graphics clear_screen print_heading draw_arrows print_labels print_radio_menu print_menu_items print_playlist_menu print_radio_connecting print_radio_playing );
+our @EXPORT = qw ( init_graphics clear_screen print_heading draw_arrows print_labels print_radio_menu print_menu_items print_playlist_menu print_playlist_playing 
+  print_radio_playing print_playlist_menu print_display_with_text );
 use base qw(Exporter);
 
 use lib "/home/pi/software";
@@ -138,7 +139,9 @@ sub init_graphics {
 #----------------------------------------------------------------------------------------------------------------------
 sub draw_image {
   my ($filename, $x_offset, $y_offset) = @_;
+  #print_error("draw image url = $filename");
   $filename = "/home/pi/software/images/$filename";
+  $filename =~ s#//#/#;
   if (-e $filename) {
     my ($path, $root, $suffix) = fileparse($filename, ("png", "PNG", "jpg", "JPG"));
     if (lc($suffix) eq "png") {
@@ -158,6 +161,7 @@ sub draw_jpg {
   my ($filename, $x_offset, $y_offset) = @_;
   my $jpeg_sizer = Image::JPEG::Size->new;
   my ($width, $height) = $jpeg_sizer->file_dimensions($filename);
+  #print_error("jpg dimensions = $width x $height");
   my $icon_image = $fb->load_image({
       'x'          => $x_offset,
       'y'          => $y_offset,
@@ -252,6 +256,7 @@ sub print_heading {
   }));
 }
 
+# arg1 = 0 for no arrows, 1 for up/down, 2 for vol up/down
 sub draw_arrows {
   my $flag = shift;
   $fb->set_color($black);
@@ -262,7 +267,6 @@ sub draw_arrows {
     'yy'         => 108,
     'filled'     => 1
   });
-  return unless $flag;
   $fb->set_color($yellow);
   $fb->line({
    'x'           => 20,
@@ -280,8 +284,14 @@ sub draw_arrows {
    'pixel_size'  => 1,
    'antialiased' => TRUE
   });
-  draw_image("up-yellow.png", 0, 31);
-  draw_image("down-blue.png", 0, 70);
+  return unless $flag;
+  if ($flag == 1) {
+    draw_image("up-yellow.png", 0, 31);
+    draw_image("down-blue.png", 0, 70);
+  } else {
+    draw_image("vol-up-yellow.png", 0, 31);
+    draw_image("vol-down-blue.png", 0, 70);
+  }
 }
 
 sub print_labels {
@@ -395,18 +405,28 @@ sub print_text {
 
 #----------------------------------------------------------------------------------------------------------------------
 # Print playlist menu
+# arg1 = ref to hash of menu
 sub print_playlist_menu {
-
+  my $menu_ref = shift;
+  print_heading($menu_ref->{"details"}->{"heading"});
+  draw_arrows($menu_ref->{"details"}->{"arrows"});
+  print_labels($menu_ref->{"details"}->{"red label"}, $menu_ref->{"details"}->{"green label"});
+  print_menu_items($menu_ref->{"items"}, $menu_ref->{"highlight"});
 }
 
-# Print radio connecting
-# arg1 = ref to hash of menu
-sub print_radio_connecting {
+# Print playlist playing
+# arg1 = ref to hash of details
+sub print_playlist_playing {
   my $menu_ref = shift;
   print_heading($menu_ref->{"details"}->{"heading"});
   print_labels($menu_ref->{"details"}->{"red label"}, $menu_ref->{"details"}->{"green label"});
-  draw_arrows();
-  print_text($menu_ref->{"text"});
+  draw_arrows($menu_ref->{"details"}->{"arrows"});
+  clear_details_area();
+  my $highlight = $menu_ref->{"track info"}->{"highlight"};
+  #print_error("highlight $highlight");
+  #print_hash_params($menu_ref->{"track info"}->{"items"}->[$highlight]);
+  #print_error("playing track ". $menu_ref->{"track info"}->{"playing track no"});
+  draw_image($menu_ref->{"track info"}->{"items"}->[$highlight]->{"tracks"}->[$menu_ref->{"track info"}->{"playing track no"}]->{"thumbnail"}, 63, 33);
 }
 
 # Print radio playing
@@ -415,7 +435,7 @@ sub print_radio_playing {
   my $menu_ref = shift;
   print_heading($menu_ref->{"details"}->{"heading"});
   print_labels($menu_ref->{"details"}->{"red label"}, $menu_ref->{"details"}->{"green label"});
-  draw_arrows();
+  draw_arrows($menu_ref->{"details"}->{"arrows"});
   draw_image($menu_ref->{"station ref"}->{"image"}, 21, 31);
 }
 
@@ -483,6 +503,14 @@ sub print_menu_items {
       $fb->draw_mode(NORMAL_MODE);
     }
   }
+}
+
+sub print_display_with_text {
+  my $menu_ref = shift;
+  print_heading($menu_ref->{"details"}->{"heading"});
+  draw_arrows();
+  print_labels();
+  print_text($menu_ref->{"text"});
 }
 
 1;
