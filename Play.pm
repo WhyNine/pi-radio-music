@@ -16,13 +16,8 @@ use List::Util;
 my $player;
 my $volume;
 
-# use `bluetoothctl connect 00:E0:4C:A9:8D:1C` to connect to speaker
-# output is:
-#Attempting to connect to 00:E0:4C:A9:8D:1C
-#[CHG] Device 00:E0:4C:A9:8D:1C Connected: yes
-#Connection successful
-
 sub init {
+  my $pa = `pulseaudio --start`;
   $player = Vlc::Engine->new();
   set_volume($speaker_vol);
 }
@@ -31,7 +26,6 @@ sub init {
 # return 1 if ok
 sub connect_speaker {
   print_error("connecting to speaker mac = $speaker_mac");
-  my $pa = `systemctl --user start pulseaudio`;
   my $res = `bluetoothctl info $speaker_mac`;
   print_error("connection to speaker: $res");
   return 1 if index($res, "Connected: yes") != -1;

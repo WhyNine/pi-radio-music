@@ -8,18 +8,15 @@ use base qw(Exporter);
 
 use lib "/home/pi/software";
 use Utils;
+use UserDetails;
 
 use RPi::Pin;
 use RPi::Const qw(:all);
 use Time::HiRes;
 
-my $GREEN_BTN = 21;
 my $green_pin;
-my $RED_BTN = 26;
 my $red_pin;
-my $YELLOW_BTN = 19;
 my $yellow_pin;
-my $BLUE_BTN = 20;
 my $blue_pin;
 my %button_definitions = ("green" => {"pin_no" => 21, "history" => "1111"}, 
                           "red" => {"pin_no" => 26, "history" => "1111"}, 

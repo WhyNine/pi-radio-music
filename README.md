@@ -8,5 +8,9 @@ The UI allows for the user to select a radio station or a music playlist, scrape
 The buttons are used as follows:
 * green = play / skip
 * red = stop / switch between radio and playlist mode
-* yellow = up
-* blue = down
+* yellow = up / volume up
+* blue = down / volume down
+
+Radio stations can either be streamed from a tvheadend server or from the internet. The metadata and images for the music is scraped from a Plex server but is played directly from the storage medium. A pigpiod daemon is expected to be running on the Pi (required to enable dimming of the backlight).
+
+The unique parameters for an installation are held in a separate YAML file.

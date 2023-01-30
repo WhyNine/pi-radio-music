@@ -5,7 +5,7 @@
 #  yellow = up
 #  blue = down
 
-# I tried using Events and IPC::MPS but they both interered with vlc. mpg123 won't play all the streams.
+# I tried using Events and IPC::MPS but they both interfered with vlc. mpg123 won't play all the both radio and songs.
 
 use strict;
 use v5.28;
@@ -80,7 +80,6 @@ my $pigpio;
 my $button_subs;               # ref to hash of colours -> functions
 my $loop_sub;                  # ref to function to run every main loop
 my $time_last_button_pressed;
-my $playlist_track_playing;
 
 my @tokens = ("X-Plex-Product" => "Radio and music player",
               "X-Plex-Version" => "1.0",
@@ -96,23 +95,23 @@ my $plexParams;
 
 #---------------------------------------------------------------------------------------------------
 sub backlight {
-  state $backlight_pin = 12;
-  state $on_time = 0;
-  state $dimmed = 0;
-  $pigpio->set_mode($backlight_pin, RPi::PIGPIO::PI_OUTPUT);
+  state $dimmed = 1;
   my $arg = shift;
-  if ($arg eq "on") {
-    #log_value(\$mqtt_instance, "Backlight on", "Main");
-    $pigpio->write_pwm($backlight_pin, 50);
-    $on_time = time();
+  if (($arg eq "on") && ($dimmed == 1)) {
+    $pigpio->write_pwm($backlight_pin, 230);
+    print_error("backlight on");
     $dimmed = 0;
   }
-  if ($arg eq "off") {
-    if ((!$dimmed) && ((time() - $on_time) > 60)) {
-      #log_value(\$mqtt_instance, "Backlight off", "Main");
-      $pigpio->write_pwm($backlight_pin, 230);
-      $dimmed = 1;
-    }
+  if (($arg eq "off") && ($dimmed == 0)) {
+    $pigpio->write_pwm($backlight_pin, 40);
+    print_error("backlight off");
+    $dimmed = 1;
+  }
+}
+
+sub dim_display_check {
+  if (time() - $time_last_button_pressed > 60) {
+    backlight("off");
   }
 }
 
@@ -120,6 +119,7 @@ sub init {
   init_graphics();
   $pigpio = RPi::PIGPIO->connect('127.0.0.1');
   print_error("Unable to connect to pigpiod", "Main") if (!$pigpio->connected());
+  $pigpio->set_mode($backlight_pin, RPi::PIGPIO::PI_OUTPUT);
   backlight("on");
 }
 
@@ -127,6 +127,7 @@ sub check_for_button {
   Input::monitor_buttons();
   if ($pressed_time != $time_last_button_pressed) {
     $time_last_button_pressed = $pressed_time;
+    backlight("on");
     return $pressed_key;
   }
 }
@@ -336,7 +337,11 @@ sub display_radio_menu {
   Play::stop();
   print_radio_menu(\%radio_menu);
   $button_subs = \%radio_menu_btns;
-  $loop_sub = \&null_sub;
+  $loop_sub = \&display_radio_monitor;
+}
+
+sub display_radio_monitor {
+  dim_display_check();
 }
 
 sub display_radio_connecting {
@@ -402,6 +407,10 @@ sub display_playlist_menu {
   print_playlist_menu(\%playlist_menu);
   $button_subs = \%playlist_menu_btns;
   $loop_sub = \&null_sub;
+}
+
+sub display_playlist_monitor {
+  dim_display_check();
 }
 
 sub display_playlist_connecting {
@@ -478,13 +487,13 @@ sub playlist_playing_next {
 }
 
 #---------------------------------------------------------------------------------------------------
-sub display_initialisng {
+sub display_initialising {
   print_display_with_text(\%initialising);
 }
 
 #---------------------------------------------------------------------------------------------------
 init();
-display_initialisng();
+display_initialising();
 Input::init();
 Play::init();
 get_playlists();
@@ -494,7 +503,6 @@ my $key;
 while (1) {
   $loop_sub->();
   if ($key = check_for_button()) {
-    #print_error("$key pressed");
     if (defined $button_subs->{$key}) {
       $button_subs->{$key}->($key);
     }

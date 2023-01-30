@@ -7,11 +7,6 @@ package Graphics;
 # green = 07E0
 # blue = 001F
 
-# say 18 pixels at bottom for button labels
-# title at top = 30
-# 4 lines of text at 20 each
-# 20 pixels at side for arrows
-
 use v5.28;
 use strict;
 
