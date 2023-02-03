@@ -1,6 +1,6 @@
 package UserDetails;
 
-our @EXPORT = qw ( $plexUrl $plexToken $speaker_mac $speaker_vol $GREEN_BTN $RED_BTN $YELLOW_BTN $BLUE_BTN $backlight_pin );
+our @EXPORT = qw ( $plexUrl $plexToken $speaker_mac $speaker_vol $GREEN_BTN $RED_BTN $YELLOW_BTN $BLUE_BTN $backlight_pin $backlight_on_level $backlight_off_level );
 use base qw(Exporter);
 use strict;
 
@@ -39,6 +39,9 @@ our $YELLOW_BTN = $$gpio{"yellow"};
 our $BLUE_BTN = $$gpio{"blue"};
 our $backlight_pin = $$gpio{"backlight"};
 
+my $backlight = $settings{"backlight"};
+our $backlight_on_level = $$backlight{"on"};
+our $backlight_off_level = $$backlight{"off"};
 
 
 1;

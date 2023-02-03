@@ -98,12 +98,12 @@ sub backlight {
   state $dimmed = 1;
   my $arg = shift;
   if (($arg eq "on") && ($dimmed == 1)) {
-    $pigpio->write_pwm($backlight_pin, 230);
+    $pigpio->write_pwm($backlight_pin, $backlight_on_level);
     print_error("backlight on");
     $dimmed = 0;
   }
   if (($arg eq "off") && ($dimmed == 0)) {
-    $pigpio->write_pwm($backlight_pin, 40);
+    $pigpio->write_pwm($backlight_pin, $backlight_off_level);
     print_error("backlight off");
     $dimmed = 1;
   }
@@ -493,6 +493,7 @@ sub display_initialising {
 
 #---------------------------------------------------------------------------------------------------
 init();
+`systemctl is-system-running --wait`;                 # wait for system to finish booting
 display_initialising();
 Input::init();
 Play::init();
