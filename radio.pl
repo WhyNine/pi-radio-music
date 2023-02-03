@@ -406,7 +406,7 @@ sub display_playlist_menu {
   Play::stop();
   print_playlist_menu(\%playlist_menu);
   $button_subs = \%playlist_menu_btns;
-  $loop_sub = \&null_sub;
+  $loop_sub = \&display_playlist_monitor;
 }
 
 sub display_playlist_monitor {

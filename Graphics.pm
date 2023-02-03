@@ -128,6 +128,7 @@ sub init_graphics {
     }
   }
   $fb->graphics_mode();
+  $fb->cls('OFF');
   clear_screen();
 }
 
@@ -217,6 +218,16 @@ sub draw_png {
 sub print_heading {
   my ($heading) = @_;
   #print_error("heading = $heading");
+  $fb->set_color($black);
+  $fb->box({
+    'x'          => 0,
+    'y'          => 0,
+    'xx'         => 160,
+    'yy'         => 30,
+    'radius'     => 0,
+    'pixel_size' => 1,
+    'filled'     => 1
+  });
   draw_image("pi-logo.png", 0, 0);
   $fb->set_color($yellow);
   $fb->line({
@@ -226,16 +237,6 @@ sub print_heading {
    'yy'          => 30,
    'pixel_size'  => 1,
    'antialiased' => TRUE
-  });
-  $fb->set_color($black);
-  $fb->box({
-    'x'          => 25,
-    'y'          => 0,
-    'xx'         => 160,
-    'yy'         => 29,
-    'radius'     => 0,
-    'pixel_size' => 1,
-    'filled'     => 1
   });
   $fb->ttf_print($fb->ttf_print({
     'x'            => 25,
@@ -374,7 +375,7 @@ sub clear_details_area {
     'x'          => 21,
     'y'          => 31,
     'xx'         => 159,
-    'yy'         => 108,
+    'yy'         => 109,
     'filled'     => 1
   });
 }
