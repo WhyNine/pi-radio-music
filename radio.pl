@@ -383,6 +383,7 @@ sub radio_playing_monitor {
     print_error("state = $state");
     display_radio_menu();
   }
+  Play::stop() if Play::check_connected_to_speaker() != 1;            # stop if speaker connection drops
 }
 
 sub update_radio_menu {
@@ -469,6 +470,7 @@ sub playlist_playing_monitor {
   if ($state ne "Playing") {
     playlist_playing_next();
   }
+  Play::stop() if Play::check_connected_to_speaker() != 1;            # stop if speaker connection drops
 }
 
 sub playlist_playing_next {

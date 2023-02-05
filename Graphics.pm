@@ -419,10 +419,7 @@ sub print_playlist_playing {
   draw_arrows($menu_ref->{"details"}->{"arrows"});
   clear_details_area();
   my $highlight = $menu_ref->{"track info"}->{"highlight"};
-  #print_error("highlight $highlight");
-  #print_hash_params($menu_ref->{"track info"}->{"items"}->[$highlight]);
-  #print_error("playing track ". $menu_ref->{"track info"}->{"playing track no"});
-  draw_image($menu_ref->{"track info"}->{"items"}->[$highlight]->{"tracks"}->[$menu_ref->{"track info"}->{"playing track no"}]->{"thumbnail"}, 63, 33);
+  draw_image($menu_ref->{"track info"}->{"items"}->[$highlight]->{"tracks"}->[$menu_ref->{"track info"}->{"playing track no"}]->{"thumbnail"}, 59, 33);
 }
 
 # Print radio playing

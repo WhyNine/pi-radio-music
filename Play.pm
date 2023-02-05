@@ -3,7 +3,7 @@ package Play;
 use v5.28;
 use strict;
 
-our @EXPORT = qw ( init play stop status connect_speaker volume_up volume_down );
+our @EXPORT = qw ( init play stop status connect_speaker volume_up volume_down check_connected_to_speaker );
 use base qw(Exporter);
 
 use lib "/home/pi/software";
@@ -22,14 +22,19 @@ sub init {
   set_volume($speaker_vol);
 }
 
+# ret 1 if connected
+sub check_connected_to_speaker {
+  my $res = `bluetoothctl info $speaker_mac`;
+  return 1 if index($res, "Connected: yes") != -1;
+  return;
+}
+
 # connect to speaker
 # return 1 if ok
 sub connect_speaker {
   print_error("connecting to speaker mac = $speaker_mac");
-  my $res = `bluetoothctl info $speaker_mac`;
-  print_error("connection to speaker: $res");
-  return 1 if index($res, "Connected: yes") != -1;
-  $res = `bluetoothctl connect $speaker_mac`;
+  return 1 if check_connected_to_speaker() == 1;
+  my $res = `bluetoothctl connect $speaker_mac`;
   print_error("result = $res");
   if (index($res, "Connection successful") != -1) {
     print_error("Bluetooth connection successful");
