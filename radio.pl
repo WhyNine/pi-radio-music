@@ -500,6 +500,7 @@ display_initialising();
 Input::init();
 Play::init();
 get_playlists();
+Play::connect_speaker();
 display_radio_menu();
 
 my $key;

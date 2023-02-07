@@ -18,7 +18,8 @@ my $volume;
 
 sub init {
   my $pa = `pulseaudio --start`;
-  $player = Vlc::Engine->new();
+  my $options = ["--no-video"];
+  $player = Vlc::Engine->new($options);
   set_volume($speaker_vol);
 }
 
