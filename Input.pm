@@ -18,10 +18,10 @@ my $green_pin;
 my $red_pin;
 my $yellow_pin;
 my $blue_pin;
-my %button_definitions = ("green" => {"pin_no" => 21, "history" => "1111"}, 
-                          "red" => {"pin_no" => 26, "history" => "1111"}, 
-                          "yellow" => {"pin_no" => 19, "history" => "1111"}, 
-                          "blue" => {"pin_no" => 20, "history" => "1111"});
+my %button_definitions = ("green" => {"pin_no" => $GREEN_BTN, "history" => "1111"}, 
+                          "red" => {"pin_no" => $RED_BTN, "history" => "1111"}, 
+                          "yellow" => {"pin_no" => $YELLOW_BTN, "history" => "1111"}, 
+                          "blue" => {"pin_no" => $BLUE_BTN, "history" => "1111"});
 
 our $pressed_key;
 our $pressed_time;
