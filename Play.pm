@@ -17,6 +17,7 @@ my $player;
 my $volume;
 
 sub init {
+  my $res = `bluetoothctl disconnect $speaker_mac`;           # make sure speaker is not connected else restart of bluetoothd will not happen in connect_speaker
   my $pa = `pulseaudio --start`;
   my $options = ["--no-video"];
   $player = Vlc::Engine->new($options);
@@ -35,7 +36,14 @@ sub check_connected_to_speaker {
 sub connect_speaker {
   print_error("connecting to speaker mac = $speaker_mac");
   return 1 if check_connected_to_speaker() == 1;
-  my $res = `bluetoothctl connect $speaker_mac`;
+  my $res = `sudo systemctl restart bluetooth`;                   # bluetoothd needs to be started after pulseaudio else no audio plays through speaker
+  while (1) {
+    $res = `journalctl --since=-1m -t bthelper -n 1 -r`;
+    last if index($res, "Changing power on succeeded") != -1;
+    print_error("waiting for bluetooth to restart");
+    sleep 1;
+  }
+  $res = `bluetoothctl connect $speaker_mac`;
   print_error("result = $res");
   if (index($res, "Connection successful") != -1) {
     print_error("Bluetooth connection successful");

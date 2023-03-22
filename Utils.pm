@@ -1,6 +1,6 @@
 package Utils;
 
-our @EXPORT = qw ( print_error print_hash_params find_element_in_array remove_trailing_squares remove_leading_article );
+our @EXPORT = qw ( print_error print_hash_params find_element_in_array remove_trailing_squares remove_leading_article check_mounted );
 use base qw(Exporter);
 
 use strict;
@@ -46,5 +46,19 @@ sub remove_leading_article {
   return $text;
 }
 
+sub check_mounted {
+  my $path = shift;
+  while (is_folder_empty($path)) {
+    print_error("Waiting for $path to become available");
+    my $tmp = `sudo mount -av`;
+    sleep 10;
+  }
+}
+
+sub is_folder_empty { 
+  my $dirname = shift; 
+  opendir(my $dh, $dirname) or die "Not a directory"; 
+  return scalar(grep { $_ ne "." && $_ ne ".." } readdir($dh)) == 0; 
+}
 
 1;

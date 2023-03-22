@@ -121,6 +121,7 @@ sub init {
   print_error("Unable to connect to pigpiod", "Main") if (!$pigpio->connected());
   $pigpio->set_mode($backlight_pin, RPi::PIGPIO::PI_OUTPUT);
   backlight("on");
+  check_mounted("/mnt/music");
 }
 
 sub check_for_button {
