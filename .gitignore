@@ -1,2 +1,4 @@
 images/.*
 UserDetails.yml
+test.pl
+test?.py
