@@ -315,7 +315,7 @@ def display_radio_playing(btn=None):
   loop_name = "radio_playing"
 
 def radio_connecting_monitor(state, connected):
-  print_error("radio connecting monitor, state = " + state)
+  #print_error("radio connecting monitor, state = " + state)
   if state == 'Playing':
     display_radio_playing()
   else:
@@ -349,18 +349,20 @@ def display_playlist_connecting(btn):
   global button_subs
   global loop_name
   graphics.print_display_with_text(playlist_connecting)
-  button_subs = playlist_connecting_btns
-  loop_name = "playlist_connecting"
   if (Play.connect_speaker()):
     track_ref = playlist_menu_items[playlist_menu["highlight"]]["tracks"]
     if len(track_ref) > 0:
       playlist_menu["playing track no"] = random.randint(0, len(track_ref))
-      play(track_ref[playlist_menu["playing track no"]]["url"])
+      if play(track_ref[playlist_menu["playing track no"]]["url"]):
+        button_subs = playlist_connecting_btns
+        loop_name = "playlist_connecting"
+      else:
+        display_playlist_menu(None)
     else:
-      display_playlist_menu()
+      display_playlist_menu(None)
   else:
     print_error("Can't connect to speaker")
-    display_playlist_menu()
+    display_playlist_menu(None)
 
 def playlist_connecting_monitor(state, connected):
   print_error("state = ", state)
@@ -368,7 +370,7 @@ def playlist_connecting_monitor(state, connected):
     display_playlist_playing()
   else:
     if ((state != "Opening") and (state != "Buffering") and (state != "Paused")):
-      display_playlist_menu()
+      display_playlist_menu(None)
 
 def update_playlist_menu(btn):
   if (btn == "yellow"):                   # up
@@ -394,7 +396,7 @@ def display_playlist_playing():
 def playlist_playing_monitor(state, connected):
   #print_error("state = state")
   if (state != "Playing"):
-    playlist_playing_next()
+    playlist_playing_next(None)
   if not connected: stop()             # stop if speaker connection drops
 
 def playlist_playing_next(btn):
@@ -450,7 +452,10 @@ def play_task(play_q, main_q):
       elif message[0] == "set_vol":
         player.set_volume(message[1])
     except:
-      main_q.put(["status", player.status(), Play.check_connected_to_speaker()])
+      if player.playing():
+        main_q.put(["status", player.status(), Play.check_connected_to_speaker()])
+      else:
+        pass
 
 #---------------------------------------------------------------------------------------------------
 play_queue = Queue()
@@ -470,7 +475,7 @@ if __name__ == '__main__':
 #    stop()
     graphics.print_display_with_text(radio_connecting)
     button_subs = radio_connecting_btns
-#    loop_name = radio_connecting_monitor
+    loop_name = "radio_connecting"
     if Play.connect_speaker():
       play(radio_menu_items[radio_menu["highlight"]]["url"])
     else:

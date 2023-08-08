@@ -40,6 +40,7 @@ def connect_speaker():
 class Player:
   volume = 0
   player = None
+  playing = False
 
   def __init__(self):
     res = run_cmd(["bluetoothctl", "disconnect", speaker_mac])           # make sure speaker is not connected else restart of bluetoothd will not happen in connect_speaker
@@ -47,7 +48,11 @@ class Player:
     self.player = vlc.MediaPlayer()
     self.set_volume(speaker_vol)
 
+  def playing(self):
+    return playing
+
   def play(self, url):
+    global playing
     self.player.stop()
     try:
       if url.startswith("http"):
@@ -57,12 +62,17 @@ class Player:
         print_error("play media = " + url)
         self.player.set_media(url)
       self.player.play()
+      playing = True
       self.set_volume(self.volume)
+      return True
     except:
       print_error("Error trying to play " + url)
+      return False
 
   def stop(self):
+    global playing
     self.player.stop()
+    playing = False
 
   def set_volume(self, vol):
     self.volume = vol
