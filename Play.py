@@ -2,6 +2,7 @@ from UserDetails import speaker_mac, speaker_vol
 from Utils import print_error, run_cmd
 
 import vlc
+import pygame
 from time import sleep
 
 # ret True if connected
@@ -46,6 +47,7 @@ class Player:
     res = run_cmd(["bluetoothctl", "disconnect", speaker_mac])           # make sure speaker is not connected else restart of bluetoothd will not happen in connect_speaker
     pa = run_cmd(["pulseaudio", "--start"])
     self.player = vlc.MediaPlayer()
+    pygame.mixer.init()
     self.set_volume(speaker_vol)
 
   def playing(self):
@@ -57,11 +59,13 @@ class Player:
     try:
       if url.startswith("http"):
         print_error("play url = " + url)
+        self.player = vlc.MediaPlayer()
         self.player.set_mrl(url)
+        self.player.play()
       else:
         print_error("play media = " + url)
-        self.player.set_media(url)
-      self.player.play()
+        pygame.mixer.music.load(url)
+        pygame.mixer.music.play()
       playing = True
       self.set_volume(self.volume)
       return True
@@ -72,6 +76,7 @@ class Player:
   def stop(self):
     global playing
     self.player.stop()
+    pygame.mixer.music.stop()
     playing = False
 
   def set_volume(self, vol):
@@ -94,5 +99,8 @@ class Player:
 # 'Ended',
 # 'Error'
   def status(self):
-    tmp = str(self.player.get_state())
-    return tmp[6: ]
+    if pygame.mixer.music.get_busy():
+      return "Playing"
+    else:
+      tmp = str(self.player.get_state())
+      return tmp[6: ]

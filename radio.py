@@ -28,6 +28,7 @@ def display_playlist_menu_tmp(btn): display_playlist_menu(btn)
 def display_radio_connecting_tmp(btn): display_radio_connecting(btn)
 def display_playlist_menu_tmp(btn): display_playlist_menu(btn)
 def update_radio_menu_tmp(btn): update_radio_menu(btn)
+
 def radio_connecting_monitor_tmp(state, connected): radio_connecting_monitor(state, connected)
 def radio_playing_monitor_tmp(state, connected): radio_playing_monitor(state, connected)
 def playlist_connecting_monitor_tmp(state, connected): playlist_connecting_monitor(state, connected)
@@ -97,8 +98,7 @@ loop_name = None                  # ref to function to run every main loop
 loop_subs = {"radio_connecting": radio_connecting_monitor_tmp, 
              "radio_playing": radio_playing_monitor_tmp, 
              "playlist_connecting": playlist_connecting_monitor_tmp, 
-             "playlist_playing": playlist_playing_monitor_tmp,
-             "playlist_connecting": playlist_connecting_monitor_tmp}
+             "playlist_playing": playlist_playing_monitor_tmp}
 
 tokens = {"X-Plex-Product" : "Radio and music player",
               "X-Plex-Version" : "1.0",
@@ -353,11 +353,10 @@ def display_playlist_connecting(btn):
     track_ref = playlist_menu_items[playlist_menu["highlight"]]["tracks"]
     if len(track_ref) > 0:
       playlist_menu["playing track no"] = random.randint(0, len(track_ref))
-      if play(track_ref[playlist_menu["playing track no"]]["url"]):
-        button_subs = playlist_connecting_btns
-        loop_name = "playlist_connecting"
-      else:
-        display_playlist_menu(None)
+      play(track_ref[playlist_menu["playing track no"]]["url"])
+      sleep(1)
+      button_subs = playlist_connecting_btns
+      loop_name = "playlist_connecting"
     else:
       display_playlist_menu(None)
   else:
@@ -365,7 +364,7 @@ def display_playlist_connecting(btn):
     display_playlist_menu(None)
 
 def playlist_connecting_monitor(state, connected):
-  print_error("state = ", state)
+  #print_error("state = " + state)
   if (state == "Playing"):
     display_playlist_playing()
   else:
@@ -394,7 +393,7 @@ def display_playlist_playing():
   loop_name = "playlist_playing"
 
 def playlist_playing_monitor(state, connected):
-  #print_error("state = state")
+  #print_error("state = " + state)
   if (state != "Playing"):
     playlist_playing_next(None)
   if not connected: stop()             # stop if speaker connection drops
@@ -469,27 +468,7 @@ if __name__ == '__main__':
   play_task = Process(target=play_task, args=(play_queue, main_queue)).start()
   display_radio_menu()
 
-  def dummy_def (btn):
-    global button_subs
-    global loop_name
-#    stop()
-    graphics.print_display_with_text(radio_connecting)
-    button_subs = radio_connecting_btns
-    loop_name = "radio_connecting"
-    if Play.connect_speaker():
-      play(radio_menu_items[radio_menu["highlight"]]["url"])
-    else:
-      print_error("Can't connect to speaker")
-      display_radio_menu(btn)
-
-#  i = 0
   while (True):
-#    i += 1
-#    if i == 120:
-#      dummy_def("green")
-#      stop()
-#      play(radio_menu_items[0]["url"])
-#      i = 0
     try:
       message = main_queue.get(True, 0.1)
       #print_error(str(message))
