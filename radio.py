@@ -294,8 +294,9 @@ def display_radio_connecting(btn):
     print_error("Can't connect to speaker")
     display_radio_menu(btn)
 
-def radio_playing_monitor(state, connected):
-  #print_error("radio playing monitor, state =" + state)
+def radio_playing_monitor(state: str, connected: bool):
+  #print_error("radio playing monitor, state = " + state)
+  #print_error("radio playing monitor, connected = " + str(connected))
   if ((state == 'Paused') or (state == 'Opening') or (state == 'Buffering')):
     print_error("state = " + state)
     display_radio_connecting()
@@ -303,7 +304,9 @@ def radio_playing_monitor(state, connected):
     if ((state == 'Stopped') or (state == 'Ended') or (state == 'Error')):
       print_error("state = " + state)
       display_radio_menu()
-  if not connected: stop()             # stop if speaker connection drops
+  if not connected:                # stop if speaker connection drops
+    stop()
+    display_radio_menu()
 
 def display_radio_playing(btn=None):
   global button_subs
@@ -396,7 +399,9 @@ def playlist_playing_monitor(state, connected):
   #print_error("state = " + state)
   if (state != "Playing"):
     playlist_playing_next(None)
-  if not connected: stop()             # stop if speaker connection drops
+  if not connected:                # stop if speaker connection drops
+    stop()
+    display_playlist_menu()
 
 def playlist_playing_next(btn):
   global button_subs

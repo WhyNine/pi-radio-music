@@ -7,12 +7,14 @@ from time import sleep
 
 # ret True if connected
 def check_connected_to_speaker():
-#  res = run_cmd(["hciconfig", ])
-#  print_error("res = " + res)
-#  return res.find("RUNNING\n") > 0
-  res = run_cmd(["bluetoothctl", "info", speaker_mac])
+  res = run_cmd(["hciconfig", ])
   #print_error("res = " + res)
-  return "Connected: yes" in res
+  tmp = "RUNNING \n" in res
+  #print_error(str(tmp))
+  return tmp
+#  res = run_cmd(["bluetoothctl", "info", speaker_mac])
+  #print_error("res = " + res)
+#  return "Connected: yes" in res
 
 # connect to speaker
 # return True if ok
@@ -22,11 +24,11 @@ def connect_speaker():
   res = run_cmd(["sudo", "systemctl", "restart", "bluetooth"])                   # bluetoothd needs to be started after pulseaudio else no audio plays through speaker
   i = 0
   while (True):
+    sleep(1)
     res = run_cmd(["journalctl", "--since=-1m", "-t", "bthelper", "-n 2", "-r"])
     print_error("result = " + res)
     if "Changing power on succeeded" in res: break
     print_error("waiting for bluetooth to restart")
-    sleep(1)
     i += 1
     if i == 60: 
       print_error("Error restarting bluetooth")
